@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1060159360850",
+    "project_id": "truth-app-206d6",
+    "storage_bucket": "truth-app-206d6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060159360850:android:b671a51ae5858ade7f748b",
+        "android_client_info": {
+          "package_name": "com.example.news_insight"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK3-wsFReMxyCwQGH6yw0cPLDF9eI00qo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
