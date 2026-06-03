@@ -111,7 +111,12 @@ Training was done on AWS SageMaker using an `ml.g4dn.xlarge` GPU instance. See `
 </p>
 
 ---
+## Mobile Application
 
+The News Insight app is available as a release APK in the [Releases](https://github.com/Danah1989/News-Insight/releases) section of this repository. For installation, download the APK file on your Android device and open the file to install the app.
+
+> **Note:** You may need to enable "Install from unknown sources" in your Android settings before installing.
+---
 ## Built With
 
 - [DistilRoBERTa](https://huggingface.co/distilroberta-base) — transformer model for text classification
@@ -123,5 +128,4 @@ Training was done on AWS SageMaker using an `ml.g4dn.xlarge` GPU instance. See `
 - [Google Fact Check Tools API](https://developers.google.com/fact-check/tools/api) — external fact-checking
 - [Anthropic Claude Haiku](https://www.anthropic.com/) — claim extraction and awareness generation
 
----
 
