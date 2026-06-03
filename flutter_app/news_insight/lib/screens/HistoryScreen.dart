@@ -20,17 +20,17 @@ class HistoryScreen extends StatelessWidget {
       future: getData(),
       builder: (context, snapshot){
         if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
-          child: CircularProgressIndicator(),
-        ); // Loading state
-  } else if (snapshot.hasError) {
-    return Text('Error: ${snapshot.error}'); // Error state
-    } else {
-    return HistoryList(
-          items: historyItems
+          return Center(
+            child: CircularProgressIndicator(),
+          ); // Loading state
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); // Error state
+        } else {
+          return HistoryList(
+              items: historyItems
           );
-    }
-    },
+        }
+      },
     );
   }
 }
@@ -78,63 +78,63 @@ class HistoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: const NewsInsightDrawer(),
-      backgroundColor: _Colors.skyLight,
-      body: Builder(builder: (BuildContext sContext){
-        return SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+        endDrawer: const NewsInsightDrawer(),
+        backgroundColor: _Colors.skyLight,
+        body: Builder(builder: (BuildContext sContext){
+          return SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 35.0),
-                    child: Text(
-                      'Search History',
-                      style: TextStyle(
-                          fontSize: 30.sp,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF2254c5)),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Card(
-                      child: IconButton(
-                        icon: Icon(Icons.menu), // Custom icon
-                        onPressed: () => Scaffold.of(sContext).openEndDrawer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 35.0),
+                      child: Text(
+                        'Search History',
+                        style: TextStyle(
+                            fontSize: 30.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF2254c5)),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                ],
-              ),
 
-              // ── Card grid ────────────────────────────────────────────────
-              Expanded(
-                child: items.isEmpty
-                    ? const _EmptyState()
-                    : GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.05,
-                  ),
-                  itemCount: items.length,
-                  itemBuilder: (_, i) => _HistoryCard(item: items[i]),
+
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: Card(
+                        child: IconButton(
+                          icon: Icon(Icons.menu), // Custom icon
+                          onPressed: () => Scaffold.of(sContext).openEndDrawer(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        );
-      })
+
+                // ── Card grid ────────────────────────────────────────────────
+                Expanded(
+                  child: items.isEmpty
+                      ? const _EmptyState()
+                      : GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+                    gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.05,
+                    ),
+                    itemCount: items.length,
+                    itemBuilder: (_, i) => _HistoryCard(item: items[i]),
+                  ),
+                ),
+              ],
+            ),
+          );
+        })
     );
   }
 
@@ -240,7 +240,7 @@ class _HistoryCard extends StatelessWidget {
                   ),
                 ),
 
-                const Spacer(),
+                const SizedBox(height: 4),
 
                 // ── Chevron hint ────────────────────────────────────────
                 Align(
@@ -312,32 +312,44 @@ class _EmptyState extends StatelessWidget {
 }
 
 Future<List<HistoryItem>> getData() async{
-   var userId = FirebaseAuth.instance.currentUser?.uid;
-   FirebaseFirestore firestore = FirebaseFirestore.instance;
-   final docSnap= await firestore.collection('search_result').where('user_id',isEqualTo: userId).orderBy('timestamp').get();
-   historyItems=<HistoryItem>[];
-   historyItems.clear();
-   for(var doc in docSnap.docs)
-     {
-       if(doc.get('verdict_source')=='model')
-         {
-           var item= HistoryItem(
-             json:doc.data() ,
-             verdict: doc.get('model_label'),
-             text: doc.get('extracted_claim'),
-           );
-           historyItems.add(item);
-         }
-       else
-         {
-           var item= HistoryItem(
-             json:doc.data() ,
-             verdict: doc.get('fact_check_label'),
-             text: doc.get('extracted_claim'),
-           );
-           historyItems.add(item);
-         }
+  var userId = FirebaseAuth.instance.currentUser?.uid;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final docSnap= await firestore.collection('search_result').where('user_id',isEqualTo: userId).orderBy('timestamp').get();
+  historyItems=<HistoryItem>[];
+  historyItems.clear();
+  for(var doc in docSnap.docs)
+  {
+    // Check if extracted_claim field exists
+    final extractedClaim = doc.data().containsKey('extracted_claim') ? doc.get('extracted_claim') : 'No text available';
 
-     }
-   return historyItems;
- }
+    // Check if verdict_source field exists, default to 'fact_check' for old documents
+    final verdictSource = doc.data().containsKey('verdict_source') ? doc.get('verdict_source') : 'fact_check';
+
+    if(verdictSource == 'model')
+    {
+      // Handle missing model_label
+      final modelLabel = doc.data().containsKey('model_label') ? doc.get('model_label') : 'Reliable';
+
+      var item= HistoryItem(
+        json:doc.data() ,
+        verdict: modelLabel,
+        text: extractedClaim,
+      );
+      historyItems.add(item);
+    }
+    else
+    {
+      // Handle missing fact_check_label
+      final factCheckLabel = doc.data().containsKey('fact_check_label') ? doc.get('fact_check_label') : 'Reliable';
+
+      var item= HistoryItem(
+        json:doc.data() ,
+        verdict: factCheckLabel,
+        text: extractedClaim,
+      );
+      historyItems.add(item);
+    }
+
+  }
+  return historyItems;
+}

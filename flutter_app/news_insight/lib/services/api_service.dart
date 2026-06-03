@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://YOUR_EC2_IP:8000';
-
+  static const String baseUrl = String.fromEnvironment('API_BASE_URL',
+      defaultValue: 'http://YOUR_EC2_IP:8000');
   Future<Map<String, dynamic>> analyzeText(String text) async {
     final url = Uri.parse('$baseUrl/analyze');
 
